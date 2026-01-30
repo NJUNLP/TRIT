@@ -1,0 +1,51 @@
+tools:
+  - class_name: "verl.tools.sandbox_fusion_tools_qwen_agent.QwenAgentSandboxFusionTool"
+    config:
+      sandbox_fusion_url: "none"
+      num_workers: 1
+      enable_global_rate_limit: true
+      rate_limit: 1
+      default_timeout: 10
+      default_language: "python"
+      memory_limit_mb: 1024
+      type: native
+
+    tool_schema:
+      type: "function"
+      function:
+        name: "code_interpreter"
+        description: "A tool for executing code."
+        parameters:
+          type: "object"
+          properties:
+            code:
+              type: "string"
+              description: "The code to execute. You can use plt.show() to display images."
+          required: ["code"]
+
+  - class_name: "verl.tools.search_tool_meituan.SearchTool"
+    config:
+      type: native
+      max_concurrent_search: 1
+      search_engine: "zhipu-search"
+      num_workers: 1
+      rate_limit: 10
+      topk: 5
+      max_retries: 5
+      is_fast_engine: True
+      timeout: 10
+      zhipu_search_engine: "search_pro_quark"
+      search_app_id: 1791013697637502981
+      
+    tool_schema:
+      type: "function"
+      function:
+        name: "search"
+        description: "Web search, using traditional search engines, complex questions need to be broken down into simple queries"
+        parameters:
+          type: "object"
+          properties:
+            query:
+              type: "string"
+              description: "Simple query suitable for traditional search engines"
+          required: ["query"]

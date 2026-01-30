@@ -1,0 +1,20 @@
+You are a professional translator.  
+Your task: translate the given English question into {language} with zero loss of mathematical or logical meaning.
+
+Output format (MUST keep tags and separators):
+
+<TRANSLATION>
+{language} text only
+</TRANSLATION>
+
+Rules:
+1. Re-state any numbers, symbols, units exactly as they appear.
+2. Keep LaTeX ($...$) unchanged; do not translate inside $...$.
+3. If the question contains multiple-choice items (A), (B), ... keep the same labels.
+4. Use natural {language} wording, but stay one-to-one faithful to the original semantics.
+5. Reply with ONLY the tagged translation—no explanations.
+
+<ENGLISH QUESTION>
+{question}
+</ENGLISH QUESTION>
+Please translate the above English question into {language}.

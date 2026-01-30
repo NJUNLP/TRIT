@@ -1,0 +1,385 @@
+#!/bin/bash
+set -x
+
+export WANDB_API_KEY="9a459e2566a6644042b1b91f63e0bfacc119d240"
+export http_proxy=http://10.217.142.137:8080
+export https_proxy=http://10.217.142.137:8080
+export CUDA_VISIBLE_DEVICES=$(seq -s "," 0 $(nvidia-smi --list-gpus | wc -l | awk '{print $1-1}'))
+export TORCH_NCCL_HEARTBEAT_TIMEOUT_SEC=3600
+export NCCL_TIMEOUT=3600
+# export TORCH_NCCL_BLOCKING_WAIT=1
+
+if [ -n "$AFO_ENV_CLUSTER_SPEC" ]; then
+    echo "AFO_ENV_CLUSTER_SPEC: $AFO_ENV_CLUSTER_SPEC"
+
+    master_addr_script="from mt_recipe.ray_hope import env_parse;print(env_parse.get_master_addr())"
+    master_port_script="from mt_recipe.ray_hope import env_parse;print(env_parse.get_master_port())"
+    node_rank_script="from mt_recipe.ray_hope import env_parse;print(env_parse.get_node_rank())"
+    nproc_per_node_script="from mt_recipe.ray_hope import env_parse;print(env_parse.get_nproc_per_node())"
+    nnodes_script="from mt_recipe.ray_hope import env_parse;print(env_parse.get_nnodes())"
+
+    master_addr=$(python3 -c "$master_addr_script")
+    master_port=$(python3 -c "$master_port_script")
+    node_rank=$(python3 -c "$node_rank_script")
+    nproc_per_node=$(python3 -c "$nproc_per_node_script")
+    nnodes=$(python3 -c "$nnodes_script")
+
+    echo "MASTER_ADDR: $master_addr"
+    echo "MASTER_PORT: $master_port"
+    echo "NODE_RANK: $node_rank"
+    echo "NPROC_PER_NODE: $nproc_per_node"
+    echo "NNODES: $nnodes"
+
+    OBJECT_STORE_MEMORY=80530636800
+    RAY_WAIT_TIME=300
+
+    # pip3 install -U "qwen-agent[gui,rag,code_interpreter,mcp]" -i https://pypi.org/simple/
+else
+    # 本地调试用代码
+    ray stop --force
+    master_addr=$(hostname -I | awk '{print $1}')
+    nnodes=1
+    nproc_per_node=8
+    node_rank=0
+    OBJECT_STORE_MEMORY=19999999999 
+    RAY_WAIT_TIME=1
+    # rm -rf /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/zhuangziyuan/workspace/ponder/verl/mt_recipe/image_in_loop/tool_workdir/*
+fi
+
+export MASTER_ADDR="$master_addr"
+export MASTER_PORT="$master_port"
+export XDG_CACHE_HOME="/workdir/tmp"
+RAY_TMP_DIR=/workdir/tmp/ray
+rm -rf $RAY_TMP_DIR/*
+# ================== ABOVE IS SCRIPTS FOR RAY CLUSTER =====================
+
+# export TORCH_CPP_LOG_LEVEL=INFO
+# export TORCH_DISTRIBUTED_DEBUG=INFO
+# export PYTHONUNBUFFERED=1
+# export TORCH_NCCL_AVOID_RECORD_STREAMS="1"
+
+# export NCCL_DEBUG=INFO
+# export NCCL_DEBUG_SUBSYS=INIT,P2P,NET,GRAPH,ENV,DYNDBG
+# export PYTHONFAULTHANDLER=1
+# export NCCL_ASYNC_ERROR_HANDLING=1
+# export NCCL_IB_TIMEOUT=120
+# export NCCL_IB_QPS_PER_CONNECTION=8
+# export NCCL_IB_RETRY_CNT=15
+# export NCCL_IB_DISABLE=1
+# export NCCL_SOCKET_IFNAME=eth5,br0
+
+# export PYTORCH_CUDA_ALLOC_CONF='max_split_size_mb:512'
+# export TOKENIZERS_PARALLELISM=false
+# export OMP_NUM_THREADS=4
+# export HADOOP_HOME=/opt/meituan/hadoop
+# export CUDA_DEVICE_MAX_CONNECTIONS=1
+# export NCCL_NVLS_ENABLE=0
+# export RAY_COLOR_PREFIX=0
+# export RAY_LOGGING_LEVEL=DEBUG
+# export OPENBLAS_NUM_THREADS=1
+# export HYDRA_FULL_ERROR=1
+export CHECK_REPETITION=1
+export USE_MATH_LJX_FINAL=1
+# ================= tool setting =================
+# export M6_CODE_INTERPRETER_WORK_DIR="/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/zhuangziyuan/workspace/ponder/verl/mt_recipe/image_in_loop/tool_workdir"
+# export INPUT_IMAGE_TMP_DIR=$M6_CODE_INTERPRETER_WORK_DIR
+
+# ================= data/model/tool =================
+
+MODEL_PATH=/mnt/hdfs/zw04mlnn01/checkpoint/llm_platform/model/Qwen/Qwen3-1.7B/main
+
+train_files="[\
+    /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/data/DAPO/dapo_3k_ja_baseline.parquet \
+]"
+
+test_files="[\
+    /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Test/MMATH/Qwen3/mmath_fr.parquet \
+]"
+
+# logging
+project_name='Liujunxiao03-MultiNode-Test'
+exp_name='H200-Test'
+CKPTS_DIR=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/checkpoints/${project_name}/${exp_name}
+export TENSORBOARD_DIR=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/tensorboard_log/${exp_name}
+
+# ================= algorithm =================
+adv_estimator=grpo
+offload=true # it's a small model, offloading will just slow-down training
+rollout_engine=vllm
+rollout_mode=sync # can be async to speedup large scale xps
+gpu_memory_utilization=0.75
+reward_manager=dapo
+
+test_freq=5
+save_freq=5
+total_epochs=5
+val_before_train=true
+
+use_kl_in_reward=false
+use_kl_loss=true
+kl_loss_coef=0.0
+
+train_batch_size=256
+ppo_mini_batch_size=64
+n_resp_per_prompt=6
+
+max_prompt_length=$((1024 * 4))
+max_response_length=$((1024 * 8))
+
+
+# Sampling params at rollouts
+temperature=1.0
+top_p=1.0
+top_k=-1 # 0 for HF rollout, -1 for vLLM rollout
+val_top_p=0.7
+
+
+# Performance Related Parameter
+# ================= performance ==================
+sp_size=1
+gen_tp=1
+
+
+if [[ "$node_rank" -ne "0" ]]; then
+    connect_flag=1
+    retry_times=0
+    MAX_RETRY_TIMES=3
+    echo "Starting running ray on WORKER node, connecting to $master_addr:6379"
+    while [[ $connect_flag -ne 0 ]] && [[ $retry_times -lt $MAX_RETRY_TIMES ]]
+    do
+        sleep 5
+        ray start --address="$master_addr:6379" --metrics-export-port 65184 --dashboard-agent-grpc-port 65185 --dashboard-agent-listen-port 65186 --temp-dir $RAY_TMP_DIR
+        connect_flag=$?
+        retry_times=$((retry_times + 1))
+        echo "Connect status: $connect_flag, Retry times: $retry_times"
+    done
+
+    if [[ $retry_times -ge $MAX_RETRY_TIMES ]]; then
+        echo "Tried for $MAX_RETRY_TIMES, Exceeds max retry times!"
+        exit 1
+    else
+        echo "Connected to MASTER"
+        sleep 20
+        ray status
+        while  [ ! -f ${TENSORBOARD_DIR}/connection/log/main_done_${MASTER_ADDR}.txt ]; do
+            echo "Waiting for main node to finish..."
+            sleep 3600
+        done
+    fi
+else
+    echo "Starting running ray on MASTER node"
+    
+    ray start --head \
+        --object-store-memory=$OBJECT_STORE_MEMORY \
+        --dashboard-port=8414 \
+        --dashboard-host='0.0.0.0' \
+        --metrics-export-port 65184 \
+        --dashboard-agent-grpc-port 65185 \
+        --dashboard-agent-listen-port 65186 \
+        --temp-dir $RAY_TMP_DIR
+
+    echo " 等待所有节点加入 ray 集群..."
+    start_time=$(date +%s)
+    while true; do
+        current_time=$(date +%s)
+        elapsed=$((current_time - start_time))
+
+        # 获取当前活跃节点数量
+        active_nodes=$(ray status | sed -n '/Active:/,/Pending:/p' | grep "1 node_" | wc -l)
+
+        echo "当前活跃节点数: $active_nodes / $nnodes"
+
+        if [ "$active_nodes" -ge "$nnodes" ]; then
+            echo "所有节点已加入集群!"
+            break
+        fi
+
+        if [ "$elapsed" -ge "$RAY_WAIT_TIME" ]; then
+            echo "错误: 等待节点加入集群超时($RAY_WAIT_TIME)，当前节点数: $active_nodes / $nnodes"
+            echo "期望节点数: $nnodes，实际节点数: $active_nodes"
+            echo "集群节点数量不足，训练任务无法继续执行!"
+            exit 1
+        fi
+
+        echo "等待更多节点加入... (已等待 ${elapsed}s / ${RAY_WAIT_TIME}s)"
+        sleep 10
+    done
+    
+    ray status
+
+    ray job submit --address="http://$master_addr:8414" \
+    -- python3 -m verl.trainer.main_ppo \
+ algorithm.adv_estimator=grpo \
+ data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/data/DAPO/dapo_3k_ja_sts.parquet \
+ data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/data/math500_ja_question_ja_prompt_ja_begin.parquet \
+ data.train_batch_size=256 \
+ data.prompt_key=query \
+ data.max_prompt_length=4096 \
+ data.max_response_length=8192 \
+ data.filter_overlong_prompts=True \
+ data.truncation='error' \
+ data.return_raw_input_ids=True \
+ data.return_raw_chat=True \
+ data.return_full_prompt=True \
+ data.target_language='JA' \
+ data.translation_acc_lower=0.2 \
+ data.translation_acc_upper=1.0 \
+ data.qt_training_ratio=1.0 \
+ actor_rollout_ref.model.path=/mnt/hdfs/zw04mlnn01/checkpoint/llm_platform/model/Qwen/Qwen3-1.7B/main \
+ actor_rollout_ref.actor.optim.lr=1e-6 \
+ actor_rollout_ref.model.use_remove_padding=True \
+ actor_rollout_ref.actor.ppo_mini_batch_size=64 \
+ actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1 \
+ actor_rollout_ref.actor.use_kl_loss=True \
+ actor_rollout_ref.actor.kl_loss_coef=0.001 \
+ actor_rollout_ref.actor.kl_loss_type=low_var_kl \
+ actor_rollout_ref.actor.entropy_coeff=0 \
+ actor_rollout_ref.actor.strategy=fsdp2 \
+ actor_rollout_ref.model.enable_gradient_checkpointing=True \
+ actor_rollout_ref.actor.fsdp_config.param_offload=True \
+ actor_rollout_ref.actor.fsdp_config.optimizer_offload=True \
+ actor_rollout_ref.rollout.translation_sample_n=16 \
+ actor_rollout_ref.rollout.translation_temperature=0.8 \
+ actor_rollout_ref.rollout.translation_top_p=0.95 \
+ actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4 \
+ actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
+ actor_rollout_ref.rollout.name=vllm \
+ actor_rollout_ref.rollout.gpu_memory_utilization=0.8 \
+ actor_rollout_ref.rollout.n=6 \
+ actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=4 \
+ actor_rollout_ref.ref.fsdp_config.param_offload=True \
+ actor_rollout_ref.ref.strategy=fsdp2 \
+ algorithm.use_kl_in_reward=False \
+ trainer.task='sts' \
+ trainer.critic_warmup=0 \
+ trainer.logger=['tensorboard','console'] \
+ trainer.n_gpus_per_node=${nproc_per_node} \
+ trainer.nnodes=${nnodes} \
+ trainer.save_freq=5 \
+ trainer.test_freq=5 \
+ trainer.project_name=DAPO3K-Qwen3-1.7B-JA \
+ trainer.experiment_name=ja_sts_8192_16_translation_samples \
+ trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-nlp-sh02/hadoop-aipnlp/FMG/liujunxiao03/checkpoints/DAPO3K-Qwen3-1.7B-JA/ja_sts_8192_8_translation_samples \
+ trainer.total_epochs=15 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-nlp-sh02/hadoop-aipnlp/FMG/liujunxiao03/logs/DAPO3K-JA-ja_sts_8192_8_translation_samples.log 
+    
+#     python3 -m verl.trainer.main_ppo \
+#  algorithm.adv_estimator=grpo \
+#  data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Train/Qwen3/DAPO3K/STS/dapo3k_fr_ja_ko_pt_th_without_zero.parquet \
+#  data.val_files=["/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Test/PolyMATH/Qwen3/Medium/fr_ja_ko_pt_th.parquet","/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Test/PolyMATH/Qwen3/High/fr_ja_ko_pt_th.parquet"] \
+#  data.train_batch_size=512 \
+#  data.prompt_key=query \
+#  data.max_prompt_length=4096 \
+#  data.max_response_length=8192 \
+#  data.filter_overlong_prompts=True \
+#  data.truncation='error' \
+#  data.return_raw_input_ids=True \
+#  data.return_raw_chat=True \
+#  data.return_full_prompt=True \
+#  data.target_language='JA' \
+#  data.translation_acc_lower=0.2 \
+#  data.translation_acc_upper=1.0 \
+#  data.qt_training_ratio=1.0 \
+#  data.shuffle=False \
+#  actor_rollout_ref.model.path=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/SFT/SFT-Checkpoint/Qwen3-1.7B/DAPO3K-5-Language-Qwen3-1.7B-EN-Question \
+#  actor_rollout_ref.actor.optim.lr=1e-6 \
+#  actor_rollout_ref.model.use_remove_padding=True \
+#  actor_rollout_ref.actor.ppo_mini_batch_size=64 \
+#  actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1 \
+#  actor_rollout_ref.actor.use_kl_loss=True \
+#  actor_rollout_ref.actor.kl_loss_coef=0.001 \
+#  actor_rollout_ref.actor.kl_loss_type=low_var_kl \
+#  actor_rollout_ref.actor.entropy_coeff=0 \
+#  actor_rollout_ref.actor.strategy=fsdp2 \
+#  actor_rollout_ref.model.enable_gradient_checkpointing=False \
+#  actor_rollout_ref.actor.fsdp_config.param_offload=True \
+#  actor_rollout_ref.actor.fsdp_config.optimizer_offload=True \
+#  actor_rollout_ref.rollout.translation_sample_n=4 \
+#  actor_rollout_ref.rollout.translation_temperature=0.7 \
+#  actor_rollout_ref.rollout.translation_top_p=0.95 \
+#  actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4 \
+#  actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
+#  actor_rollout_ref.rollout.name=vllm \
+#  actor_rollout_ref.rollout.gpu_memory_utilization=0.75 \
+#  actor_rollout_ref.rollout.n=6 \
+#  actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=4 \
+#  actor_rollout_ref.ref.fsdp_config.param_offload=True \
+#  actor_rollout_ref.ref.strategy=fsdp2 \
+#  actor_rollout_ref.rollout.val_kwargs.temperature=0.6 \
+#  actor_rollout_ref.rollout.val_kwargs.top_p=0.95 \
+#  actor_rollout_ref.rollout.val_kwargs.n=4 \
+#  algorithm.use_kl_in_reward=False \
+#  trainer.task='sts-solo-language' \
+#  trainer.critic_warmup=0 \
+#  trainer.logger=['tensorboard','console'] \
+#  trainer.n_gpus_per_node=${nproc_per_node} \
+#  trainer.nnodes=${nnodes} \
+#  trainer.save_freq=5 \
+#  trainer.test_freq=5 \
+#  trainer.project_name=DAPO3K-5-Languages-Qwen3-1D7B \
+#  trainer.experiment_name=sts_8k_no_zero_with_translation \
+#  trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-nlp-sh02/hadoop-aipnlp/FMG/liujunxiao03/checkpoints/DAPO3K-5-Languages-Qwen3-1D7B/sts_8k_no_zero_with_translation \
+#  trainer.total_epochs=10
+    
+    # python3 -m verl.trainer.main_ppo \
+    #     algorithm.adv_estimator=${adv_estimator} \
+    #     data.train_files="${train_files}" \
+    #     data.val_files="${test_files}" \
+    #     data.prompt_key=query \
+    #     data.truncation='left' \
+    #     data.train_batch_size=${train_batch_size} \
+    #     data.max_prompt_length=${max_prompt_length} \
+    #     data.max_response_length=${max_response_length} \
+    #     data.return_raw_input_ids=True \
+    #     data.return_raw_chat=True \
+    #     data.return_full_prompt=True \
+    #     data.target_language='JA' \
+    #     data.translation_acc_lower=0.2 \
+    #     data.translation_acc_upper=1.0 \
+    #     data.qt_training_ratio=1.0 \
+    #     actor_rollout_ref.rollout.n=${n_resp_per_prompt} \
+    #     algorithm.use_kl_in_reward=${use_kl_in_reward} \
+    #     actor_rollout_ref.actor.use_kl_loss=${use_kl_loss} \
+    #     actor_rollout_ref.actor.kl_loss_coef=${kl_loss_coef} \
+    #     actor_rollout_ref.actor.kl_loss_type=low_var_kl \
+    #     actor_rollout_ref.model.use_remove_padding=true \
+    #     actor_rollout_ref.rollout.name=${rollout_engine} \
+    #     actor_rollout_ref.model.path="${MODEL_PATH}" \
+    #     actor_rollout_ref.model.enable_gradient_checkpointing=true \
+    #     actor_rollout_ref.actor.optim.lr=1e-6 \
+    #     actor_rollout_ref.actor.ppo_mini_batch_size=${ppo_mini_batch_size} \
+    #     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1 \
+    #     actor_rollout_ref.actor.strategy=fsdp2 \
+    #     actor_rollout_ref.actor.fsdp_config.param_offload=${offload} \
+    #     actor_rollout_ref.actor.fsdp_config.optimizer_offload=${offload} \
+    #     actor_rollout_ref.actor.entropy_coeff=0 \
+    #     actor_rollout_ref.rollout.gpu_memory_utilization=${gpu_memory_utilization} \
+    #     actor_rollout_ref.rollout.translation_sample_n=4 \
+    #     actor_rollout_ref.rollout.translation_temperature=0.6 \
+    #     actor_rollout_ref.rollout.translation_top_p=0.95 \
+    #     actor_rollout_ref.rollout.val_kwargs.temperature=0.6 \
+    #     actor_rollout_ref.rollout.val_kwargs.top_p=0.95 \
+    #     actor_rollout_ref.rollout.val_kwargs.n=4 \
+    #     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4 \
+    #     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
+    #     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=4 \
+    #     actor_rollout_ref.ref.fsdp_config.param_offload=${offload} \
+    #     actor_rollout_ref.ref.strategy=fsdp2 \
+    #     trainer.critic_warmup=0 \
+    #     trainer.logger='["console", "tensorboard"]' \
+    #     trainer.project_name="${project_name}" \
+    #     trainer.experiment_name="${exp_name}" \
+    #     trainer.n_gpus_per_node=${nproc_per_node} \
+    #     trainer.nnodes=${nnodes} \
+    #     trainer.val_before_train=${val_before_train} \
+    #     trainer.test_freq=${test_freq} \
+    #     trainer.save_freq=${save_freq} \
+    #     trainer.total_epochs=${total_epochs} \
+    #     trainer.default_local_dir="${CKPTS_DIR}" \
+    #     trainer.resume_mode=auto
+
+        # +reward_model.reward_kwargs.overlong_buffer_cfg.log=false \
+        # +reward_model.reward_kwargs.max_resp_len=${max_response_length} \
+        mkdir -p ${TENSORBOARD_DIR}/connection/log
+        touch ${TENSORBOARD_DIR}/connection/log/main_done_${MASTER_ADDR}.txt
+        sleep 15
+fi
