@@ -1,6 +1,6 @@
 # TRIT: Translation-Reasoning Integrated Training
 
-**[Paper](https://arxiv.org/abs/XXXX.XXXXX) | [Data](https://huggingface.co/datasets/NJUNLP/TRIT-Data)**
+**[Paper](https://arxiv.org/abs/XXXX.XXXXX) | [Data](https://huggingface.co/datasets/masterLan/TRIT-DATA)**
 
 Official implementation of "Self-Improving Multilingual Long Reasoning via Translation-Reasoning Integrated Training"
 
@@ -94,7 +94,7 @@ pip install -r requirements.txt
 
 ### Data
 
-Download training data from [Hugging Face](https://huggingface.co/datasets/NJUNLP/TRIT-Data).
+Download training data from [Hugging Face](https://huggingface.co/datasets/masterLan/TRIT-DATA).
 
 ### Training
 
