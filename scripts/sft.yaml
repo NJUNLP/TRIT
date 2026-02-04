@@ -1,0 +1,43 @@
+### model
+model_name_or_path: <YOUR_MODEL_PATH>  # 请填写你的模型路径
+
+### method
+stage: sft
+do_train: true
+finetuning_type: full
+deepspeed: <YOUR_DEEPSPEED_CONFIG_PATH>  # 请填写你的 DeepSpeed 配置文件路径
+
+### dataset
+dataset: <YOUR_DATASET_NAME>  # 请填写你的数据集名称
+template: <YOUR_TEMPLATE_NAME>  # 请填写你的模板名称（如：qwen3, llama3 等）
+cutoff_len: 10000
+overwrite_cache: true
+preprocessing_num_workers: 80
+
+### output
+output_dir: <YOUR_OUTPUT_DIR>  # 请填写你的输出目录路径
+save_strategy: steps
+logging_steps: 5
+save_steps: 20
+save_total_limit: 2
+plot_loss: true
+overwrite_output_dir: true
+
+### train
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 8
+learning_rate: 0.00001
+
+weight_decay: 0.01
+max_grad_norm: 1.0
+warmup_ratio: 0.1
+num_train_epochs: 2
+gradient_checkpointing: true
+lr_scheduler_type: cosine
+bf16: true
+ddp_timeout: 180000000
+report_to: tensorboard      # 打开 TensorBoard 记录
+logging_dir: <YOUR_LOGGING_DIR>  # 请填写你的日志目录路径（通常为 output_dir/runs）
+flash_attn: fa2
+optim: paged_adamw_8bit
+

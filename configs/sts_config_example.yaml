@@ -1,0 +1,116 @@
+# Self-improving via Self-translation (StS) Configuration Example
+# 基于SvS配置修改，添加StS特有参数
+
+# Trainer configuration
+trainer:
+  task: "sts"  # 设置为sts以使用RayStSTrainer
+  project_name: "StS-Training"
+  experiment_name: "self-translation-multilingual"
+  logger: "wandb"  # or "swanlab"
+  
+  # Training parameters
+  total_epochs: 3
+  total_training_steps: null
+  critic_warmup: 1
+  test_freq: 50
+  save_freq: 100
+  val_before_train: true
+  val_only: false
+  
+  # Logging and saving
+  default_local_dir: "./checkpoints"
+  default_hdfs_dir: null
+  max_actor_ckpt_to_keep: 3
+  max_critic_ckpt_to_keep: 3
+  
+  # Resource configuration
+  n_gpus_per_node: 8
+  nnodes: 1
+  balance_batch: true
+  device: "cuda"
+
+# Data configuration with StS-specific parameters
+data:
+  # Basic data parameters
+  train_files: ["path/to/train_data.jsonl"]
+  val_files: ["path/to/val_data.jsonl"]
+  train_batch_size: 64
+  val_batch_size: null
+  max_prompt_length: 2048
+  max_response_length: 2048
+  shuffle: true
+  
+  # StS specific parameters
+  target_language: "ZH"  # 目标语言，例如中文
+  translation_source_acc_lower: 0.5  # 第一阶段准确率下限
+  translation_source_acc_upper: 1.0  # 进入翻译阶段的准确率上限
+  qt_training_ratio: 1.0  # QT训练样本比例
+  
+  # Prompts for different stages
+  translation_prompt: |
+    Please translate the following English mathematical question to {target_language}. Keep the mathematical expressions and symbols unchanged.
+    
+    English question: {question}
+    
+    Translated question in {target_language}:
+  
+  reasoning_prompt: "\n\nPlease solve this step by step."  # 推理阶段的额外prompt
+
+# Model configuration
+actor_rollout_ref:
+  model:
+    path: "path/to/your/model"
+    trust_remote_code: true
+    use_remove_padding: false
+    lora_rank: 0
+    
+  actor:
+    strategy: "fsdp"
+    ppo_micro_batch_size_per_gpu: 1
+    ppo_mini_batch_size: 8
+    loss_agg_mode: "token-mean"
+    use_kl_loss: false
+    
+  rollout:
+    name: "vllm"
+    mode: "sync"  # or "async"
+    n: 4  # 每个问题生成的回答数量
+    temperature: 0.7
+    top_p: 0.9
+    max_new_tokens: 2048
+    
+    # StS specific rollout parameters
+    translation_n_samples: 4     # 翻译阶段每个问题的采样数量
+    translation_temperature: 0.7  # 翻译阶段的temperature
+    translation_top_p: 0.9        # 翻译阶段的top_p
+    
+    val_kwargs:
+      n: 1
+      do_sample: true
+      temperature: 0.1
+
+# Critic configuration (if using GAE)
+critic:
+  strategy: "fsdp"
+  ppo_micro_batch_size_per_gpu: 1
+  ppo_mini_batch_size: 8
+  model:
+    path: "path/to/critic/model"
+    trust_remote_code: true
+
+# Algorithm configuration
+algorithm:
+  adv_estimator: "GRPO"  # or "GAE" if using critic
+  gamma: 1.0
+  lam: 0.95
+  use_kl_in_reward: false
+  norm_adv_by_std_in_grpo: true
+
+# Reward model configuration
+reward_model:
+  enable: false  # 使用基于规则的奖励函数
+  launch_reward_fn_async: false
+
+# Ray initialization
+ray_init:
+  num_cpus: 64

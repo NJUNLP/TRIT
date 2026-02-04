@@ -1,0 +1,90 @@
+work_dir: /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/zhuangziyuan/workspace/ponder/verl/mt_recipe/image_in_loop/tool_workdir
+tools:
+  - class_name: "verl.tools.sandbox_fusion_tools_qwen_agent.QwenAgentSandboxFusionTool"
+    config:
+      sandbox_fusion_url: "dummy"
+      num_workers: 20
+      enable_global_rate_limit: true
+      rate_limit: 20
+      default_timeout: 10
+      default_language: "python"
+      memory_limit_mb: 1024
+      type: native
+      return_base64: false
+      work_dir: ${work_dir}/ci
+
+    tool_schema:
+      type: "function"
+      function:
+        name: "code_interpreter"
+        description: "Executes valid Python code and returns textual results and/or generated plots."
+        parameters:
+          type: "object"
+          properties:
+            code:
+              type: "string"
+              description: >
+                Python code to execute.
+                - Do not include markdown code fences (```python).
+                - Ensure the code is syntactically valid.
+                - If generating plots using matplotlib, call `plt.show()` for each image.
+                - NEVER save image in local file system.
+          required: ["code"]
+
+  - class_name: "verl.tools.browser_tool.BrowseTool"
+    config:
+      num_workers: 1
+      enable_global_rate_limit: true
+      rate_limit: 1
+      timeout: 30
+      max_retries: 1
+      work_dir: ${work_dir}/browse
+      type: native
+      max_document_length: 16000
+
+    tool_schema:
+      type: "function"
+      function:
+        name: "browse"
+        description: "Web browsing to get detailed content from web pages."
+        parameters:
+          type: "object"
+          properties:
+            urls:
+              type: "array"
+              items: {"type": "string"}
+              description: "List of URLs to browse."
+          required: ["urls"]
+
+  - class_name: "verl.tools.image_zoom_in_meituan.ImageZoomInTool"
+    config:
+      num_workers: 1
+      enable_global_rate_limit: true
+      rate_limit: 1
+      timeout: 30
+      max_retries: 1
+      work_dir: ${work_dir}/zoom_in
+      type: native
+      max_document_length: 16000
+
+    tool_schema:
+      type: "function"
+      function:
+        name: "image_zoom_in_tool"
+        description: "Zoom in on a specific region of an image by cropping it based on a bounding box (bbox) and an optional object label."
+        parameters:
+          type: "object"
+          properties:
+            bbox_2d:
+              type: "array"
+              items: {"type": "number"}
+              minItems: 4
+              maxItems: 4
+              description: "The bounding box of the region to zoom in, as [x1, y1, x2, y2], where (x1, y1) is the top-left corner and (x2, y2) is the bottom-right corner."
+            image_path:
+              type: "string"
+              description: "The image path to be zoomed in."
+            label:
+              type: "string"
+              description: "The name or label of the object in the specified bounding box (optional)."
+          required: ["bbox_2d", "image_path"]
