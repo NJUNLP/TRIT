@@ -1430,8 +1430,8 @@ class RayTRITTrainer(RayPPOTrainer):
         
         # 获取StS相关配置
         self.target_language = self.config.data.get("target_language", "ZH")
-        self.translation_acc_lower = self.config.data.get("translation_source_acc_lower", 0.5)
-        self.translation_acc_upper = self.config.data.get("translation_source_acc_upper", 1.0)
+        self.translation_acc_lower = self.config.data.get("translation_acc_lower", 0.5)
+        self.translation_acc_upper = self.config.data.get("translation_acc_upper", 1.0)
         self.qt_training_ratio = self.config.data.get("qt_training_ratio", 1.0)
         
         # 读取翻译prompt模板
