@@ -85,7 +85,7 @@ export USE_MATH_LJX_FINAL=1
 export ONLY_ACCURACY_REWARD=1
 # export USE_SLC_REWARD=1
 # ================= tool setting =================
-export TENSORBOARD_DIR="/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/tensorboard_log/DAPO3K-5-Languages-Qwen3-1D7B/naive_8k"
+export TENSORBOARD_DIR="/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/tensorboard_log/DAPO3K-5-Languages-Qwen3-1D7B/naive_8k"
 
 
 if [[ "$node_rank" -ne "0" ]]; then
@@ -109,7 +109,7 @@ if [[ "$node_rank" -ne "0" ]]; then
         echo "Connected to MASTER"
         sleep 20
         ray status
-        while  [ ! -f /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/scripts/Meituan/Qwen3-1.7B/DAPO3K-5-Languages/mul-slc.sh/main_done.txt ]; do
+        while  [ ! -f /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/scripts/Meituan/Qwen3-1.7B/DAPO3K-5-Languages/mul-slc.sh/main_done.txt ]; do
             echo "Waiting for main node to finish..."
             sleep 3600
         done
@@ -158,8 +158,8 @@ else
     ray job submit --address="http://$master_addr:8414" \
     -- python3 -m verl.trainer.main_ppo \
  algorithm.adv_estimator=grpo \
- data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Train/Qwen3/DAPO3K/dapo3k_fr_ja_ko_pt_th_without_prefix.parquet \
- data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Test/MMATH/Qwen3/Without-Prefix/mmath_fr_ja_ko_pt_th.parquet \
+ data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/dataset/Train/Qwen3/DAPO3K/dapo3k_fr_ja_ko_pt_th_without_prefix.parquet \
+ data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/dataset/Test/MMATH/Qwen3/Without-Prefix/mmath_fr_ja_ko_pt_th.parquet \
  data.train_batch_size=512 \
  data.prompt_key=query \
  data.max_prompt_length=4096 \

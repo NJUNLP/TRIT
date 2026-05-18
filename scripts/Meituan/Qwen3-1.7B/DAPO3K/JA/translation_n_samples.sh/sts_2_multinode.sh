@@ -117,8 +117,8 @@ echo "Launching distributed training..."
 ray job submit --address="http://$MASTER_ADDR:8414" \
     -- python3 -m verl.trainer.main_ppo \
         algorithm.adv_estimator=grpo \
-        data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/data/DAPO/dapo_3k_ja_sts.parquet \
-        data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/data/math500_ja_question_ja_prompt_ja_begin.parquet \
+        data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/data/DAPO/dapo_3k_ja_sts.parquet \
+        data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/data/math500_ja_question_ja_prompt_ja_begin.parquet \
         data.train_batch_size=256 \
         data.prompt_key=query \
         data.max_prompt_length=4096 \
@@ -166,7 +166,7 @@ ray job submit --address="http://$MASTER_ADDR:8414" \
         trainer.test_freq=5 \
         trainer.project_name=DAPO3K-Qwen3-1.7B-JA \
         trainer.experiment_name=ja_sts_8192_2_translation_samples \
-        trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/checkpoints/DAPO3K-Qwen3-1.7B-JA/ja_sts_8192_2_translation_samples \
+        trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/checkpoints/DAPO3K-Qwen3-1.7B-JA/ja_sts_8192_2_translation_samples \
         trainer.total_epochs=5
 
 touch /workdir/main_done_${MASTER_ADDR}.txt

@@ -28,7 +28,7 @@
 # export HYDRA_FULL_ERROR=1
 
 export NCCL_TIMEOUT=3600
-cd /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918
+cd /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 export CHECK_REPETITION=1
 export USE_MATH_LJX_FINAL=1
@@ -39,8 +39,8 @@ export TRANSLATION_MODEL_NAME="default"
 
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
  algorithm.adv_estimator=grpo \
- data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Train/DAPO3K-5-Language-Qwen3-1.7B-EN-Question/STS/dapo3k_fr_ja_ko_pt_th.parquet \
- data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Test/MMATH/DeepSeek-Distill/mmath_fr_ja_ko_pt_th.parquet \
+ data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/dataset/Train/DAPO3K-5-Language-Qwen3-1.7B-EN-Question/STS/dapo3k_fr_ja_ko_pt_th.parquet \
+ data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/dataset/Test/MMATH/DeepSeek-Distill/mmath_fr_ja_ko_pt_th.parquet \
  data.train_batch_size=512 \
  data.prompt_key=query \
  data.max_prompt_length=4096 \
@@ -93,5 +93,5 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
  trainer.val_before_train=False \
  trainer.project_name=DAPO3K-5-Languages-DeepSeek-Distill-1D5B \
  trainer.experiment_name=sts_other_translation \
- trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/checkpoints/DAPO3K-5-Languages-DeepSeek-Distill-1D5B/sts_other_translation \
- trainer.total_epochs=5 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/logs/DAPO3K-5-Languages-DeepSeek-Distill-1D5B-sts_other_translation.log 
+ trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/checkpoints/DAPO3K-5-Languages-DeepSeek-Distill-1D5B/sts_other_translation \
+ trainer.total_epochs=5 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/logs/DAPO3K-5-Languages-DeepSeek-Distill-1D5B-sts_other_translation.log 

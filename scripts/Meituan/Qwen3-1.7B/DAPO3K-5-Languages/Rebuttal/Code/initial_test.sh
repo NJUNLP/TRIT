@@ -80,9 +80,10 @@ rm -rf $RAY_TMP_DIR/*
 # export HYDRA_FULL_ERROR=1
 
 
-export USE_CODE_REWARD=1
 # ================= tool setting =================
-export TENSORBOARD_DIR="/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/tensorboard_log/DAPO3K-5-Languages-Qwen3-1D7B-Code/initial_test"
+# Note: USE_CODE_REWARD is no longer needed, using reward_manager=prime_code instead
+# export USE_CODE_REWARD=1
+export TENSORBOARD_DIR="/mnt/dolphinfs/ssd_pool/docker/user/hadoop-nlp-sh02/hadoop-aipnlp/FMG/liujunxiao03/tensorboard_log/DAPO3K-5-Languages-Qwen3-1D7B-Code/initial_test_0203"
 
 
 if [[ "$node_rank" -ne "0" ]]; then
@@ -106,7 +107,7 @@ if [[ "$node_rank" -ne "0" ]]; then
         echo "Connected to MASTER"
         sleep 20
         ray status
-        while  [ ! -f /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/scripts/Meituan/Qwen3-1.7B/DAPO3K-5-Languages/mul-slc.sh/main_done.txt ]; do
+        while  [ ! -f /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/scripts/Meituan/Qwen3-1.7B/DAPO3K-5-Languages/mul-slc.sh/main_done.txt ]; do
             echo "Waiting for main node to finish..."
             sleep 3600
         done
@@ -155,8 +156,8 @@ else
     ray job submit --address="http://$master_addr:8414" \
     -- python3 -m verl.trainer.main_ppo \
  algorithm.adv_estimator=grpo \
- data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Train/Code/passed_data_train.parquet \
- data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Train/Code/passed_data_test.parquet \
+ data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/dataset/Train/Code/passed_data_train_with_entry_point.parquet \
+ data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/dataset/Train/Code/passed_data_test_with_entry_point.parquet \
  data.train_batch_size=512 \
  data.prompt_key=query \
  data.max_prompt_length=4096 \
@@ -199,6 +200,11 @@ else
  actor_rollout_ref.ref.fsdp_config.param_offload=True \
  actor_rollout_ref.ref.strategy=fsdp2 \
  algorithm.use_kl_in_reward=False \
+ reward_model.reward_manager=prime_code \
+ +reward_model.reward_kwargs.max_workers=16 \
+ +reward_model.reward_kwargs.timeout=120 \
+ +reward_model.reward_kwargs.use_batch_processing=True \
+ +reward_model.reward_kwargs.num_examine=10 \
  trainer.task='normal' \
  trainer.critic_warmup=0 \
  trainer.logger=['tensorboard','console'] \
@@ -207,8 +213,8 @@ else
  trainer.save_freq=5 \
  trainer.test_freq=5 \
  trainer.project_name=DAPO3K-5-Languages-Qwen3-1D7B-Code \
- trainer.experiment_name=initial_test \
- trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/checkpoints/DAPO3K-5-Languages-Qwen3-1D7B-Code/initial_test \
- trainer.total_epochs=5 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/logs/DAPO3K-5-Languages-Qwen3-1D7B-Code-initial_test.log 
+ trainer.experiment_name=initial_test_0203 \
+ trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-nlp-sh02/hadoop-aipnlp/FMG/liujunxiao03/checkpoints/DAPO3K-5-Languages-Qwen3-1D7B-Code/initial_test_0203 \
+ trainer.total_epochs=5 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-nlp-sh02/hadoop-aipnlp/FMG/liujunxiao03/logs/DAPO3K-5-Languages-Qwen3-1D7B-Code-initial_test_0203.log 
 
 fi

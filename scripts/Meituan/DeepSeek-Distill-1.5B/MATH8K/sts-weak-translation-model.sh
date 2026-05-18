@@ -2,7 +2,7 @@
 # # 设置成对照组，看看效果
 # conda activate /home/nfs05/anaconda3/envs/ljx-verl
 # export DEBUGGING_STS=True
-cd /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918
+cd /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 export CHECK_REPETITION=1
 export USE_MATH_LJX_FINAL=1
@@ -12,8 +12,8 @@ export TRANSLATION_MODEL_NAME="default"
 
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
  algorithm.adv_estimator=grpo \
- data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/data/math8k-distill-sts.parquet \
- data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/data/math500_ja_question_ja_prompt_ja_begin-deepseek-distill-1123-modify.parquet \
+ data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/data/math8k-distill-sts.parquet \
+ data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/data/math500_ja_question_ja_prompt_ja_begin-deepseek-distill-1123-modify.parquet \
  data.train_batch_size=256 \
  data.prompt_key=query \
  data.max_prompt_length=4096 \
@@ -61,5 +61,5 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
  trainer.test_freq=5 \
  trainer.project_name=MATH8K-DeepSeek-R1-Distill-Qwen-1.5B-JA \
  trainer.experiment_name=ja_full_sft_sts_8192_weak_model_translation \
- trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/checkpoints/MATH8K-DeepSeek-R1-Distill-Qwen-1.5B-JA/ja_full_sft_sts_8192_weak_model_translation \
- trainer.total_epochs=15 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/logs/MATH8K-JA-DeepSeek-R1-Distill-Qwen-1.5B-ja_full_sft_sts_8192_weak_model_translation.log 
+ trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/checkpoints/MATH8K-DeepSeek-R1-Distill-Qwen-1.5B-JA/ja_full_sft_sts_8192_weak_model_translation \
+ trainer.total_epochs=15 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/logs/MATH8K-JA-DeepSeek-R1-Distill-Qwen-1.5B-ja_full_sft_sts_8192_weak_model_translation.log 

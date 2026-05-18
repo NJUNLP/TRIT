@@ -38,7 +38,8 @@ LANGUAGE_MAP = {
     "TH": ["th"],
     "KO": ["ko"],
     "PT": ["pt"],
-    "VI": ["vi"]
+    "VI": ["vi"],
+    "ID": ["id"]
 }
 
 

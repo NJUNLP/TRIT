@@ -1,6 +1,6 @@
 # DeepSeek-5-Language-Finetune后的模型
-# 训练集：/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Train/DeepSeek-Distill/DAPO3K/dapo3k_fr_ja_ko_pt_th.parquet
-# 测试集：/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Test/MMATH/DeepSeek-Distill/mmath_fr_ja_ko_pt_th.parquet
+# 训练集：/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/dataset/Train/DeepSeek-Distill/DAPO3K/dapo3k_fr_ja_ko_pt_th.parquet
+# 测试集：/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/dataset/Test/MMATH/DeepSeek-Distill/mmath_fr_ja_ko_pt_th.parquet
 
 # export TORCH_CPP_LOG_LEVEL=INFO
 # export TORCH_DISTRIBUTED_DEBUG=INFO
@@ -28,15 +28,15 @@
 # export HYDRA_FULL_ERROR=1
 export NCCL_TIMEOUT=3600
 
-cd /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918
+cd /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 export CHECK_REPETITION=1
 export USE_MATH_LJX_FINAL=1
 
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
  algorithm.adv_estimator=grpo \
- data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Train/DeepSeek-Distill/DAPO3K/dapo3k_fr_ja_ko_pt_th.parquet \
- data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Test/MMATH/DeepSeek-Distill/mmath_fr_ja_ko_pt_th.parquet \
+ data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/dataset/Train/DeepSeek-Distill/DAPO3K/dapo3k_fr_ja_ko_pt_th.parquet \
+ data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/dataset/Test/MMATH/DeepSeek-Distill/mmath_fr_ja_ko_pt_th.parquet \
  data.train_batch_size=512 \
  data.prompt_key=query \
  data.max_prompt_length=4096 \
@@ -87,5 +87,5 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
  trainer.test_freq=5 \
  trainer.project_name=DAPO3K-5-Languages-DeepSeek-Distill-1D5B \
  trainer.experiment_name=baseline-8k \
- trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/checkpoints/DAPO3K-5-Languages-DeepSeek-Distill-1D5B/baseline-8k \
- trainer.total_epochs=15 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/logs/DAPO3K-5-Languages-DeepSeek-Distill-1D5B-baseline-8k.log 
+ trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/checkpoints/DAPO3K-5-Languages-DeepSeek-Distill-1D5B/baseline-8k \
+ trainer.total_epochs=15 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/logs/DAPO3K-5-Languages-DeepSeek-Distill-1D5B-baseline-8k.log 

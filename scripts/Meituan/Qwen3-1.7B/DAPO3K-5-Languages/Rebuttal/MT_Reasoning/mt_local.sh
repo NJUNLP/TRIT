@@ -3,14 +3,14 @@ export CHECK_REPETITION=1
 export USE_MATH_LJX_FINAL=1
 export USE_MT_LJX_FINAL=1
 # ================= tool setting =================
-export TENSORBOARD_DIR="/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/tensorboard_log/DAPO3K-5-Languages-Qwen3-1D7B-MT/mt-0120"
+export TENSORBOARD_DIR="/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/tensorboard_log/DAPO3K-5-Languages-Qwen3-1D7B-MT/mt-0120"
 
 
 
 python3 -m verl.trainer.main_ppo \
  algorithm.adv_estimator=grpo \
- data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Train/Qwen3/DAPO3K/mt.parquet \
- data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Train/Qwen3/DAPO3K/mt-test.parquet \
+ data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/dataset/Train/Qwen3/DAPO3K/mt.parquet \
+ data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/dataset/Train/Qwen3/DAPO3K/mt-test.parquet \
  data.train_batch_size=512 \
  data.prompt_key=query \
  data.max_prompt_length=4096 \
@@ -62,5 +62,5 @@ python3 -m verl.trainer.main_ppo \
  trainer.test_freq=5 \
  trainer.project_name=DAPO3K-5-Languages-Qwen3-1D7B-MT \
  trainer.experiment_name=mt-0120 \
- trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/checkpoints/DAPO3K-5-Languages-Qwen3-1D7B-MT/mt-0120 \
- trainer.total_epochs=5 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/logs/DAPO3K-5-Languages-Qwen3-1D7B-MT-mt-0120.log 
+ trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/checkpoints/DAPO3K-5-Languages-Qwen3-1D7B-MT/mt-0120 \
+ trainer.total_epochs=5 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/logs/DAPO3K-5-Languages-Qwen3-1D7B-MT-mt-0120.log 

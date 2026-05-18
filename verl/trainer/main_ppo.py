@@ -23,8 +23,21 @@ import ray
 from omegaconf import OmegaConf
 
 from verl.trainer.ppo.ray_trainer import (
+    RayStSOtherTranslationSoloLanguageFilterTrainer,
+    RayStSSoloLanguageFilterPaddingTrainer,
+    RayStSSoloLanguageFilterTrainer,
+    RayStSSoloLanguageTrainer,
     RayPPOTrainer, 
-    RayTRITTrainer
+    RayStSTrainer, 
+    RayStSStageOneENTrainer,
+    RayStSSoloLanguageFilterTrainerRepair,
+    RayStSSoloLanguageOnlyStageOneTrainer,
+    RayStSSoloLanguageFilterTrainerRepair0114,
+    RayStSSoloLanguageFilterTrainer0114,
+    RayStSSoloLanguageFilterTrainer0128,
+    RayStSSoloLanguageFilterTrainer0210,
+    RayStSSoloLanguageFilterTrainer0114Comet,
+    RayStSSoloLanguageFilterTrainer0114LLMJudge
 )
 from verl.trainer.ppo.reward import load_reward_manager
 
@@ -171,10 +184,38 @@ class TaskRunner:
         val_dataset = create_rl_dataset(config.data.val_files, config.data, tokenizer, processor)
         train_sampler = create_rl_sampler(config.data, train_dataset)
 
-
-        if config.trainer.task == "trit":
-            Trainer = RayTRITTrainer
+        # Initialize the PPO trainer.
+        if config.trainer.task == "sts":
+            Trainer = RayStSTrainer
+        elif config.trainer.task == "sts-solo-language":
+            Trainer = RayStSSoloLanguageTrainer
+        elif config.trainer.task == "sts-solo-language-filter":
+            Trainer = RayStSSoloLanguageFilterTrainer
+        elif config.trainer.task == "sts-solo-language-filter-padding":
+            Trainer = RayStSSoloLanguageFilterPaddingTrainer
+        elif config.trainer.task == "sts-other-translate-solo":
+            Trainer = RayStSOtherTranslationSoloLanguageFilterTrainer
+        elif config.trainer.task == "sts-stage-one-en":
+            Trainer = RayStSStageOneENTrainer
+        elif config.trainer.task == "sts-solo-language-filter-repair":
+            Trainer = RayStSSoloLanguageFilterTrainerRepair
+        elif config.trainer.task == "sts-solo-language-only-stage-one":
+            Trainer = RayStSSoloLanguageOnlyStageOneTrainer
+        elif config.trainer.task == "sts-solo-language-filter-repair-0114":
+            Trainer = RayStSSoloLanguageFilterTrainerRepair0114
+        elif config.trainer.task == "sts-solo-language-filter-0114":
+            Trainer = RayStSSoloLanguageFilterTrainer0114
+        elif config.trainer.task == "sts-solo-language-filter-0210":
+            Trainer = RayStSSoloLanguageFilterTrainer0210
+        elif config.trainer.task == "sts-solo-language-filter-0114-comet":
+            Trainer = RayStSSoloLanguageFilterTrainer0114Comet
+        elif config.trainer.task == "sts-solo-language-filter-0114-llm-judge":
+            Trainer = RayStSSoloLanguageFilterTrainer0114LLMJudge
+        elif config.trainer.task == "sts-solo-language-filter-0128":
+            Trainer = RayStSSoloLanguageFilterTrainer0128
         elif config.trainer.task == "normal":
+            Trainer = RayPPOTrainer
+        else:
             Trainer = RayPPOTrainer
 
         trainer = Trainer(

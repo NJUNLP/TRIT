@@ -83,7 +83,7 @@ export HYDRA_FULL_ERROR=1
 export CHECK_REPETITION=1
 export USE_MATH_LJX_FINAL=1
 # ================= tool setting =================
-export TENSORBOARD_DIR="/mnt/dolphinfs/ssd_pool/docker/user/hadoop-nlp-sh02/hadoop-aipnlp/FMG/liujunxiao03/tensorboard_log/DAPO3K-5-Languages-Qwen3-4B/Rebuttal-Filter-0114"
+export TENSORBOARD_DIR="/mnt/dolphinfs/ssd_pool/docker/user/hadoop-nlp-sh02/hadoop-aipnlp/FMG/liujunxiao03/tensorboard_log/DAPO3K-5-Languages-Qwen3-4B/TRIT_ID"
 
 
 if [[ "$node_rank" -ne "0" ]]; then
@@ -107,7 +107,7 @@ if [[ "$node_rank" -ne "0" ]]; then
         echo "Connected to MASTER"
         sleep 20
         ray status
-        while  [ ! -f /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/scripts/Meituan/Qwen3-1.7B/DAPO3K-5-Languages/mul-slc.sh/main_done.txt ]; do
+        while  [ ! -f /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/scripts/Meituan/Qwen3-1.7B/DAPO3K-5-Languages/mul-slc.sh/main_done.txt ]; do
             echo "Waiting for main node to finish..."
             sleep 3600
         done
@@ -156,8 +156,8 @@ else
     ray job submit --address="http://$master_addr:8414" \
     -- python3 -m verl.trainer.main_ppo \
  algorithm.adv_estimator=grpo \
- data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Train/Qwen3/DAPO3K/STS/dapo3k_fr_ja_ko_pt_th.parquet \
- data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Test/MMATH/Qwen3/mmath_fr_ja_ko_pt_th_1_sample.parquet \
+ data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/NJUWorkspace/TRIT/MeiTuan/TRIT/dataset/Train/Qwen3/DAPO3K/STS/dapo3k_id.parquet \
+ data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/NJUWorkspace/TRIT/MeiTuan/TRIT/dataset/Test/MMATH/Qwen3/mmath_fr_ja_ko_pt_th_1_sample.parquet \
  data.train_batch_size=512 \
  data.prompt_key=query \
  data.max_prompt_length=4096 \
@@ -167,7 +167,7 @@ else
  data.return_raw_input_ids=True \
  data.return_raw_chat=True \
  data.return_full_prompt=True \
- data.target_language='JA' \
+ data.target_language='ID' \
  data.translation_acc_lower=0.2 \
  data.translation_acc_upper=1.0 \
  data.qt_training_ratio=1.0 \
@@ -208,9 +208,9 @@ else
  trainer.save_freq=2 \
  trainer.test_freq=5 \
  trainer.project_name=DAPO3K-5-Languages-Qwen3-4B \
- trainer.experiment_name=Rebuttal-Filter-0114 \
- trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-nlp-sh02/hadoop-aipnlp/FMG/liujunxiao03/checkpoints/DAPO3K-5-Languages-Qwen3-4B/Rebuttal-Filter-0114 \
- trainer.total_epochs=8 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-nlp-sh02/hadoop-aipnlp/FMG/liujunxiao03/logs/DAPO3K-5-Languages-Qwen3-4B-Rebuttal-Filter-0114.log 
+ trainer.experiment_name=TRIT-ID-0405 \
+ trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-nlp-sh02/hadoop-aipnlp/FMG/liujunxiao03/checkpoints/DAPO3K-5-Languages-Qwen3-4B/TRIT-ID-0405 \
+ trainer.total_epochs=8 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-nlp-sh02/hadoop-aipnlp/FMG/liujunxiao03/logs/DAPO3K-5-Languages-Qwen3-4B-TRIT-ID-0405.log 
 
 fi
 # 这个脚本首先是修复了第一阶段的bug，把所有大于0的数据都纳入进来，其次依旧使用翻译前缀

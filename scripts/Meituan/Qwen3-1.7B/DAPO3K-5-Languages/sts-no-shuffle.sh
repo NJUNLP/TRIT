@@ -28,7 +28,7 @@
 # export HYDRA_FULL_ERROR=1
 export NCCL_TIMEOUT=3600
 
-cd /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918
+cd /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 export CHECK_REPETITION=1
 export USE_MATH_LJX_FINAL=1
@@ -36,8 +36,8 @@ export USE_MATH_LJX_FINAL=1
 
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
  algorithm.adv_estimator=grpo \
- data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Train/Qwen3/DAPO3K/STS/dapo3k_no_shuffle_fr_ja_ko_pt_th.parquet \
- data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/dataset/Test/MMATH/Qwen3/mmath_fr_ja_ko_pt_th.parquet \
+ data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/dataset/Train/Qwen3/DAPO3K/STS/dapo3k_no_shuffle_fr_ja_ko_pt_th.parquet \
+ data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/dataset/Test/MMATH/Qwen3/mmath_fr_ja_ko_pt_th.parquet \
  data.train_batch_size=512 \
  data.prompt_key=query \
  data.max_prompt_length=4096 \
@@ -89,10 +89,10 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
  trainer.test_freq=5 \
  trainer.project_name=DAPO3K-5-Languages-Qwen3-1D7B \
  trainer.experiment_name=sts_8k_no_shuffle_repair \
- trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/checkpoints/DAPO3K-5-Languages-Qwen3-1D7B/sts_8k_no_shuffle_repair \
- trainer.total_epochs=10 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/logs/DAPO3K-5-Languages-Qwen3-1D7B-sts_8k_no_shuffle_repair.log 
+ trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/checkpoints/DAPO3K-5-Languages-Qwen3-1D7B/sts_8k_no_shuffle_repair \
+ trainer.total_epochs=10 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/logs/DAPO3K-5-Languages-Qwen3-1D7B-sts_8k_no_shuffle_repair.log 
 
 # bash /home/nfs05/liujx/Inference/scripts/temp.sh
 
-# bash /home/nfs05/liujx/GithubRepos/SvS-0918/scripts/run_sts_qwen3_1.7b-remove-translation.sh
+# bash /home/nfs05/liujx/GithubRepos/TRIT/scripts/run_sts_qwen3_1.7b-remove-translation.sh
 # bash /home/nfs05/liujx/Inference/scripts/temp.sh

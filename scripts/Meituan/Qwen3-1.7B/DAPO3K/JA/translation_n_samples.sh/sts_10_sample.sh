@@ -2,15 +2,15 @@
 # # 设置成对照组，看看效果
 # conda activate /home/nfs05/anaconda3/envs/ljx-verl
 # export DEBUGGING_STS=True
-cd /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918
+cd /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 export CHECK_REPETITION=1
 export USE_MATH_LJX_FINAL=1
 
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
  algorithm.adv_estimator=grpo \
- data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/data/DAPO/dapo_3k_ja_sts.parquet \
- data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/data/math500_ja_question_ja_prompt_ja_begin.parquet \
+ data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/data/DAPO/dapo_3k_ja_sts.parquet \
+ data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/data/math500_ja_question_ja_prompt_ja_begin.parquet \
  data.train_batch_size=256 \
  data.prompt_key=query \
  data.max_prompt_length=4096 \
@@ -58,5 +58,5 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
  trainer.test_freq=5 \
  trainer.project_name=DAPO3K-Qwen3-1.7B-JA \
  trainer.experiment_name=ja_sts_8192_10_translation_samples \
- trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/checkpoints/DAPO3K-Qwen3-1.7B-JA/ja_sts_8192_10_translation_samples \
- trainer.total_epochs=15 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/logs/DAPO3K-JA-ja_sts_8192_10_translation_samples.log 
+ trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/checkpoints/DAPO3K-Qwen3-1.7B-JA/ja_sts_8192_10_translation_samples \
+ trainer.total_epochs=15 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/logs/DAPO3K-JA-ja_sts_8192_10_translation_samples.log 

@@ -83,7 +83,7 @@ export HYDRA_FULL_ERROR=1
 export CHECK_REPETITION=1
 export USE_MATH_LJX_FINAL=1
 # ================= tool setting =================
-export TENSORBOARD_DIR="/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/tensorboard_log/DAPO3K-Qwen3-1.7B-JA/ja_sts_8192_mul"
+export TENSORBOARD_DIR="/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/tensorboard_log/DAPO3K-Qwen3-1.7B-JA/ja_sts_8192_mul"
 
 
 if [[ "$node_rank" -ne "0" ]]; then
@@ -107,7 +107,7 @@ if [[ "$node_rank" -ne "0" ]]; then
         echo "Connected to MASTER"
         sleep 20
         ray status
-        while  [ ! -f /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/scripts/Meituan/Qwen3-1.7B/DAPO3K-5-Languages/mul-slc.sh/main_done.txt ]; do
+        while  [ ! -f /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/scripts/Meituan/Qwen3-1.7B/DAPO3K-5-Languages/mul-slc.sh/main_done.txt ]; do
             echo "Waiting for main node to finish..."
             sleep 3600
         done
@@ -156,8 +156,8 @@ else
     ray job submit --address="http://$master_addr:8414" \
     -- python3 -m verl.trainer.main_ppo \
  algorithm.adv_estimator=grpo \
- data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/data/DAPO/dapo_3k_ja_sts.parquet \
- data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/data/math500_ja_question_ja_prompt_ja_begin.parquet \
+ data.train_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/data/DAPO/dapo_3k_ja_sts.parquet \
+ data.val_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/data/math500_ja_question_ja_prompt_ja_begin.parquet \
  data.train_batch_size=256 \
  data.prompt_key=query \
  data.max_prompt_length=4096 \
@@ -205,7 +205,7 @@ else
  trainer.test_freq=5 \
  trainer.project_name=DAPO3K-Qwen3-1.7B-JA \
  trainer.experiment_name=ja_sts_8192_mul \
- trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/SvS-0918/checkpoints/DAPO3K-Qwen3-1.7B-JA/ja_sts_8192_mul \
+ trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/FMG/liujunxiao03/MeiTuan/TRIT/checkpoints/DAPO3K-Qwen3-1.7B-JA/ja_sts_8192_mul \
  trainer.total_epochs=15 2>&1 | tee /mnt/dolphinfs/ssd_pool/docker/user/hadoop-nlp-sh02/hadoop-aipnlp/FMG/liujunxiao03/logs/DAPO3K-5-Languages-Qwen3-1D7B-ja_sts_8192_mul.log 
 
 fi
