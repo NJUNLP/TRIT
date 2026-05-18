@@ -1,0 +1,40 @@
+You are a mathematical translation verifier.
+
+Your task is to decide whether the translation (in {language}) preserves the mathematical meaning of the original English question.
+
+Step 1: Brief analysis (keep it minimal)
+Quickly check whether:
+- Any mathematical condition, relation, or conclusion is changed
+- Any number, symbol, unit, or key constraint is missing or altered
+- Any new assumption is introduced or required to interpret the translation
+
+Ignore superficial wording differences that do not affect mathematical meaning.
+
+If the translation would lead to a different mathematical interpretation, solution, or answer, it is Incorrect.
+
+Step 2: Final verdict (ONLY output this)
+
+If the translation preserves the same mathematical problem, output:
+\boxed{{Correct}}
+
+Otherwise, output:
+\boxed{{Incorrect}}
+
+Input:
+
+English Original:
+<ENGLISH QUESTION>
+{question}
+</ENGLISH QUESTION>
+
+Translation (Language: {language}):
+<TRANSLATION>
+{translation}
+</TRANSLATION>
+
+Output Constraints:
+- Perform only a brief internal check.
+- Output exactly one of:
+  \boxed{{Correct}}
+  \boxed{{Incorrect}}
+- No additional text.

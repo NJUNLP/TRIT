@@ -1,0 +1,26 @@
+# Checkpoints & Models
+SFT-Checkpoint/
+temp-model/
+checkpoints/
+
+# Data (raw/intermediate, not dataset)
+data/
+
+# Training outputs & logs
+outputs/
+tensorboard_log/
+logs/
+
+# Large dataset file (>100MB, GitHub limit)
+dataset/SFT-Dataset/sft-dataset.jsonl
+
+# Python cache
+**/__pycache__/
+*.pyc
+
+# Deprecated/temp scripts
+merge-ckpt.sh
+test_compute_score_validation.py
+test_sft.py
+use_reward_eval_output_temp.py
+use_reward_eval_output.py

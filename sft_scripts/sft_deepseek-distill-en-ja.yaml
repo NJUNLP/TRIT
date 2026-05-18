@@ -1,0 +1,47 @@
+### model
+model_name_or_path: /home/nfs05/model/DeepSeek-R1-Distill-Qwen-1.5B
+
+### method
+stage: sft
+do_train: true
+finetuning_type: full
+deepspeed: /home/nfs05/liujx/GithubRepos/LLaMA-Factory/examples/deepspeed/ds_z3_offload_config.json
+
+### dataset
+dataset: MATH8K-EN-Question-JA-Response-3000
+template: deepseekr1
+cutoff_len: 6000
+overwrite_cache: true
+preprocessing_num_workers: 80
+
+### output
+output_dir: /home/nfs05/liujx/GithubRepos/SvS-0918/SFT-Checkpoint/DeepSeek-R1-Distill-Qwen-1.5B/MATH8K-EN-Question-JA-Response-3000
+save_strategy: steps
+logging_steps: 5
+save_steps: 20
+save_total_limit: 2
+plot_loss: true
+overwrite_output_dir: true
+
+### train
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 8
+learning_rate: 0.00001
+
+weight_decay: 0.01
+max_grad_norm: 1.0
+warmup_ratio: 0.1
+num_train_epochs: 2
+gradient_checkpointing: true
+lr_scheduler_type: cosine
+bf16: true
+ddp_timeout: 180000000
+use_swanlab: true
+swanlab_project: DeepSeek-1D5B
+swanlab_run_name: MATH8K-EN-Question-JA-Response-3000
+swanlab_logdir: /home/nfs05/liujx/ljx-swanlab/DeepSeek-1D5B/MATH8K-EN-Question-JA-Response-3000 
+swanlab_mode: local
+swanlab_workspace: DeepSeek-1D5B
+flash_attn: fa2
+optim: paged_adamw_8bit
+

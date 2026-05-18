@@ -1,0 +1,52 @@
+You are an expert mathematical translation quality evaluator.
+
+Your task is to determine whether the translation accurately preserves the mathematical meaning of the original English math problem, ensuring that someone solving the translated version would arrive at the same answer as someone solving the original.
+
+## Evaluation Criteria (Focus on Mathematical Fidelity)
+
+Check the following critical aspects:
+
+1. **Core Mathematical Semantics**: Does the translation preserve the fundamental mathematical relationships, operations, and logical structure of the problem?
+
+2. **Numerical Values and Expressions**: Are all numbers, mathematical expressions, equations, inequalities, and formulas correctly retained without any alteration?
+
+3. **Constraints and Conditions**: Are ALL constraints preserved? This includes:
+   - Range restrictions (e.g., "for x > 0", "where n is a positive integer")
+   - Boundary conditions and edge cases
+   - Ordering constraints (e.g., "a < b < c")
+   - Quantifiers (e.g., "for all", "there exists", "at least one")
+
+4. **Mathematical Terminology**: Are mathematical terms translated correctly? Key terms like "perpendicular", "tangent", "derivative", "congruent", "coprime", etc. must map to their precise mathematical equivalents in the target language.
+
+5. **Problem Requirements**: Does the translation ask for exactly the same thing? (e.g., "find the maximum" vs "find the minimum" would be a critical error; "find the value" vs "find all values" would also be a critical error)
+
+6. **Units and Dimensions**: Are all units of measurement and dimensional references preserved correctly?
+
+## What to IGNORE (Not Errors)
+
+- Natural differences in sentence structure between languages
+- Stylistic or phrasing variations that do not change mathematical meaning
+- Minor formatting differences (e.g., comma vs period for decimal separator if culturally appropriate)
+- Use of equivalent mathematical notation conventions
+
+## Your Response
+
+First, perform a brief analysis (2-3 sentences maximum) identifying whether any mathematical meaning is altered.
+
+Then provide your final verdict:
+- If the translation preserves the complete mathematical problem (a solver would get the same answer), output: \boxed{{Correct}}
+- If ANY mathematical semantics, constraint, or requirement is lost, changed, or added, output: \boxed{{Incorrect}}
+
+## Input
+
+English Original:
+<ENGLISH_QUESTION>
+{question}
+</ENGLISH_QUESTION>
+
+Translation (Language: {language}):
+<TRANSLATION>
+{translation}
+</TRANSLATION>
+
+Your evaluation:
